@@ -6,12 +6,23 @@ using System.Threading.Tasks;
 
 namespace Beer_Collection.Data
 {
+    //public class BeerContext : DbContext
+    //{
+    //    public BeerContext(DbContextOptions<BeerContext> options) : base(options)
+    //    {
+    //    }
+
+    //    public DbSet<Beer> Beers { get; set; }
+    //}
+
     public class BeerContext : DbContext
     {
-        public BeerContext(DbContextOptions<BeerContext> options) : base(options)
-        {
-        }
+        public DbSet<Beer> Beers { get; set; }
 
-        public DbSet<Beer> Beers{ get; set; }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=beerdb;Trusted_Connection=True;");
+        }
     }
 }
+

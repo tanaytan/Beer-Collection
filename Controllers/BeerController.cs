@@ -28,21 +28,28 @@ namespace Beer_Collection.Controller
         }
 
         // GET: api/Beers/id
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Beer>> GetBeer(int id)
+        [HttpGet("{name}")]
+        public async Task<ActionResult<Beer>> GetBeer(string name)
         {
-            var beer = await _context.Beers.FindAsync(id);
+            //var beer = await _context.Beers.FindAsync(name);
 
-            if (beer == null)
+            using (var beer = new BeerContext())
             {
-                return NotFound();
+                var beerName = (from s in beer.Beers
+                                where s.Name.ToUpper().Contains(name.ToUpper()) //string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase)  
+                                select s).FirstOrDefault<Beer>();
+                return beerName;
             }
 
-            return beer;
+            /*if (beer == null)
+            {
+                return NotFound();
+            }*/
+
         }
 
         // PUT: api/Beers/5
-        [HttpPut("{id}")]
+        [HttpPut("{rating}")]
         public async Task<IActionResult> PutBeer(int id, Beer rating)
         {
             if (id != rating.Id)
