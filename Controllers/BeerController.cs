@@ -31,46 +31,42 @@ namespace Beer_Collection.Controller
         [HttpGet("{name}")]
         public async Task<ActionResult<Beer>> GetBeer(string name)
         {
-            //var beer = await _context.Beers.FindAsync(name);
-
-            using (var beer = new BeerContext())
+            try
             {
-                var beerName = (from s in beer.Beers
-                                where s.Name.ToUpper().Contains(name.ToUpper()) //string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase)  
-                                select s)
-                                .Include(x => x.Ratings)
-                                .FirstOrDefault<Beer>();
-                return beerName;
+                using (var beer = new BeerContext())
+                {
+                    var beerName = beer.Beers.Where(s => s.Name.ToUpper().Contains(name.ToUpper()))
+                                             .Include(x => x.Ratings)
+                                             .FirstOrDefault<Beer>();
+
+                    return beerName;
+                }
+
             }
-
-            /*if (beer == null)
-            {
-                return NotFound();
-            }*/
-
+            catch(Exception ex)
+            {                
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         // PUT: api/Beers/5
         [HttpPut]
-        public async Task<IActionResult> PutBeer([FromBody] Rating rating, int beerId)
+        public async Task<IActionResult> PutBeer([FromBody] Rating rating)
         {
-            
-            _context.Ratings.Add(rating);
+            if (BeerExists(rating.BeerId) == false)
+            {
+                return NotFound();
+            }
 
+            _context.Ratings.Add(rating);
             try
             {
-                    await _context.SaveChangesAsync();
+               await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch(Exception ex)
             {
-                if (!BeerExists(beerId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
             }
 
             return StatusCode(200, rating);
@@ -81,7 +77,14 @@ namespace Beer_Collection.Controller
         public async Task<ActionResult<Beer>> PostBeer([FromBody]Beer beer)
         {
             _context.Beers.Add(beer);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
             return StatusCode(201, beer);
         }
@@ -97,7 +100,14 @@ namespace Beer_Collection.Controller
             }
 
             _context.Beers.Remove(beer);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
             return beer;
         }
