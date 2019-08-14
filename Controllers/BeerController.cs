@@ -33,12 +33,12 @@ namespace Beer_Collection.Controller
         {
             try
             {
-                using (var beer = new BeerContext())
+                using (var beer = _context)
                 {
                     var beerName = beer.Beers.Where(s => s.Name.ToUpper().Contains(name.ToUpper()))
                                              .Include(x => x.Ratings)
                                              .FirstOrDefault<Beer>();
-
+                    await _context.SaveChangesAsync();
                     return beerName;
                 }
 
@@ -53,16 +53,16 @@ namespace Beer_Collection.Controller
         // PUT: api/Beers/5
         [HttpPut]
         public async Task<IActionResult> PutBeer([FromBody] Rating rating)
-        {
-            if (BeerExists(rating.BeerId) == false)
-            {
-                return NotFound();
-            }
+        {            
 
             _context.Ratings.Add(rating);
             try
             {
-               await _context.SaveChangesAsync();
+                if (BeerExists(rating.BeerId) == false)
+                {
+                    return NotFound();
+                }
+                await _context.SaveChangesAsync();
             }
             catch(Exception ex)
             {
@@ -76,9 +76,10 @@ namespace Beer_Collection.Controller
         [HttpPost]
         public async Task<ActionResult<Beer>> PostBeer([FromBody]Beer beer)
         {
-            _context.Beers.Add(beer);
+           
             try
             {
+                _context.Beers.Add(beer);
                 await _context.SaveChangesAsync();
             }
             catch(Exception ex)
@@ -94,14 +95,14 @@ namespace Beer_Collection.Controller
         public async Task<ActionResult<Beer>> DeleteBeer(int id)
         {
             var beer = await _context.Beers.FindAsync(id);
-            if (beer == null)
-            {
-                return NotFound();
-            }
-
-            _context.Beers.Remove(beer);
             try
             {
+                if (beer == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Beers.Remove(beer);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
