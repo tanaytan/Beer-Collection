@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,8 +14,23 @@ namespace Beer_Collection.Data
 
         public string Type { get; set; }
 
-        public int Rating { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<Rating> Ratings { get; set; }
 
-        public bool IsDone { get; set; }
+        public double Rating { get
+            {
+                return Ratings?.Average(x => x.RatingNum) ?? 0;
+            } }
+    }
+
+    public class Rating
+    {
+        public int Id { get; set; }
+
+        public int RatingNum { get; set; }
+
+        public int BeerId { get; set; }
+
+        public virtual Beer Beer { get; set; }
     }
 }

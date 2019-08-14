@@ -18,6 +18,7 @@ namespace Beer_Collection.Data
     public class BeerContext : DbContext
     {
         public DbSet<Beer> Beers { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

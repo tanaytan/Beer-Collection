@@ -37,7 +37,9 @@ namespace Beer_Collection.Controller
             {
                 var beerName = (from s in beer.Beers
                                 where s.Name.ToUpper().Contains(name.ToUpper()) //string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase)  
-                                select s).FirstOrDefault<Beer>();
+                                select s)
+                                .Include(x => x.Ratings)
+                                .FirstOrDefault<Beer>();
                 return beerName;
             }
 
@@ -49,23 +51,19 @@ namespace Beer_Collection.Controller
         }
 
         // PUT: api/Beers/5
-        [HttpPut("{rating}")]
-        public async Task<IActionResult> PutBeer(int id, Beer rating)
+        [HttpPut]
+        public async Task<IActionResult> PutBeer([FromBody] Rating rating, int beerId)
         {
-            if (id != rating.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(rating).State = EntityState.Modified;
+            
+            _context.Ratings.Add(rating);
 
             try
             {
-                await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!BeerExists(id))
+                if (!BeerExists(beerId))
                 {
                     return NotFound();
                 }
@@ -75,7 +73,7 @@ namespace Beer_Collection.Controller
                 }
             }
 
-            return NoContent();
+            return StatusCode(200, rating);
         }
 
         // POST: api/Beers
