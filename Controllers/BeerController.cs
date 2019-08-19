@@ -19,7 +19,7 @@ namespace Beer_Collection.Controller
         {
             _context = context;
         }
-        
+
         // GET: api/Beers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Beer>>> GetBeer()
@@ -33,38 +33,34 @@ namespace Beer_Collection.Controller
         {
             try
             {
-                using (var beer = _context)
-                {
-                    var beerName = beer.Beers.Where(s => s.Name.ToUpper().Contains(name.ToUpper()))
-                                             .Include(x => x.Ratings)
-                                             .FirstOrDefault<Beer>();
-                    await _context.SaveChangesAsync();
-                    return beerName;
-                }
-
+                var beer = await _context.Beers.Where(s => s.Name.ToUpper().Contains(name.ToUpper()))
+                                         .Include(x => x.Ratings)
+                                         .FirstOrDefaultAsync<Beer>();
+                return beer;
             }
-            catch(Exception ex)
-            {                
+
+            catch (Exception ex)
+            {
                 return BadRequest(ex.Message);
             }
-            
+
         }
 
         // PUT: api/Beers/5
         [HttpPut]
         public async Task<IActionResult> PutBeer([FromBody] Rating rating)
-        {            
-
-            _context.Ratings.Add(rating);
+        {
             try
             {
+                _context.Ratings.Add(rating);
+
                 if (BeerExists(rating.BeerId) == false)
                 {
                     return NotFound();
                 }
                 await _context.SaveChangesAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -76,13 +72,13 @@ namespace Beer_Collection.Controller
         [HttpPost]
         public async Task<ActionResult<Beer>> PostBeer([FromBody]Beer beer)
         {
-           
+
             try
             {
                 _context.Beers.Add(beer);
                 await _context.SaveChangesAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
