@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,8 +11,10 @@ namespace Beer_Collection.Data
     {
         public int Id { get; set; }
 
+        [Required]
         public string Name { get; set; }
 
+        [Required]
         public string Type { get; set; }
 
         [JsonIgnore]
@@ -27,6 +30,7 @@ namespace Beer_Collection.Data
     {
         public int Id { get; set; }
 
+        [Range(1, 5)]
         public int RatingNum { get; set; }
 
         public int BeerId { get; set; }

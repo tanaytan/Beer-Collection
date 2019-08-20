@@ -76,7 +76,15 @@ namespace Beer_Collection.Controller
             try
             {
                 _context.Beers.Add(beer);
-                await _context.SaveChangesAsync();
+               
+                if (ModelState.IsValid)
+                {
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    return BadRequest(ModelState);
+                }
             }
             catch (Exception ex)
             {
